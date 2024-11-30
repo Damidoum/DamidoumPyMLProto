@@ -12,7 +12,7 @@ class Tensor:
 
     def __init__(
         self,
-        data: np.ndarray | None,
+        data: np.ndarray,
         requires_grad: bool = False,
         primitive: Primitive | None = None,
         parent_nodes: list[Tensor] | None = None,
@@ -40,11 +40,8 @@ class Tensor:
         Args:
             value (np.ndarray): data to be set as the data attribute of the tensor
         """
-        if value is None:
-            self._data = None
-        else:
-            is_valid_array(value)
-            self._data = value
+        is_valid_array(value)
+        self._data = value
 
     def __add__(self, other: Tensor) -> Tensor:
         return Tensor(
@@ -110,12 +107,14 @@ class Add(Primitive):
 
 
 class Mul(Primitive):
-    def forward(self, inputs: list[Tensor]):
+    @staticmethod
+    def forward(inputs: list[Tensor]):
         if len(inputs) != 2:
             raise ValueError("Mul primitive requires exactly two inputs")
         if inputs[0].data.shape[1] != inputs[1].data.shape[0]:
             raise ValueError("Shapes of input tensors must match")
         return inputs[0].data @ inputs[1].data
 
-    def backward(self, incomming_grad, inputs: list[Tensor]):
+    @staticmethod
+    def backward(incomming_grad, inputs: list[Tensor]):
         pass
