@@ -103,7 +103,11 @@ class Add(Primitive):
 
     @staticmethod
     def backward(incomming_grad, inputs: list[Tensor]):
-        pass
+        if len(inputs) != 2:
+            raise ValueError("Add primitive requires exactly two inputs")
+        if inputs[0].data.shape != inputs[1].data.shape:
+            raise ValueError("Shapes of input tensors must match")
+        return incomming_grad, incomming_grad
 
 
 class Mul(Primitive):
@@ -117,4 +121,8 @@ class Mul(Primitive):
 
     @staticmethod
     def backward(incomming_grad, inputs: list[Tensor]):
-        pass
+        if len(input) != 2:
+            raise ValueError("Mul primitive requires exactly two inputs")
+        if inputs[0].data.shape[1] != inputs[1].data.shape[0]:
+            raise ValueError("Shapes of input tensors must match")
+        return incomming_grad @ inputs[1].data.T, inputs[0].data.T @ incomming_grad
